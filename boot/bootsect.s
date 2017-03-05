@@ -2,6 +2,8 @@
 ! SYS_SIZE is the number of clicks (16 bytes) to be loaded.
 ! 0x3000 is 0x30000 bytes = 196kB, more than enough for current
 ! versions of linux
+! //SYS_SIZE 是要加载的滴答数（16 bytes）
+! //0x3000 是 0x3000 bytes = 196 kB,远远超出现阶段linux的需要
 !
 SYSSIZE = 0x3000
 !
@@ -9,9 +11,12 @@ SYSSIZE = 0x3000
 !
 ! bootsect.s is loaded at 0x7c00 by the bios-startup routines, and moves
 ! iself out of the way to address 0x90000, and jumps there.
-!
+! //根据bios启动惯例bootsect.s在0x7c00处被加载，并将它自己移动到0x90000处并且
+! //转跳到此处
+! 
 ! It then loads 'setup' directly after itself (0x90200), and the system
 ! at 0x10000, using BIOS interrupts. 
+! // 然后在他末尾（0x90200）直接加载 ‘setup’，在0x10000处的系统，使用BIOS中断
 !
 ! NOTE! currently system is at most 8*65536 bytes long. This should be no
 ! problem, even in the future. I want to keep it simple. This 512 kB
