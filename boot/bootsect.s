@@ -22,21 +22,26 @@ SYSSIZE = 0x3000
 ! problem, even in the future. I want to keep it simple. This 512 kB
 ! kernel size should be enough, especially as this doesn't contain the
 ! buffer cache as in minix
+! //注意！现在系统最大是 8*0xFFFF bytes（512KB） 大。这个甚至在将来应当不会有问题。
+! //我想保持内核的简洁。这个512KB的内核大小应当是足够的，特别是这个内核像
+! //minix一样没有包含缓冲区缓存
 !
 ! The loader has been made as simple as possible, and continuos
 ! read errors will result in a unbreakable loop. Reboot by hand. It
 ! loads pretty fast by getting whole sectors at a time whenever possible.
-
-.globl begtext, begdata, begbss, endtext, enddata, endbss
-.text
+! //加载器已经被尽可能的精简，在一个不可中断的循环里不断的读取错误。手动重启。
+! //它加载的相当快因为它尽可能的一次读取所有扇区的信息。
+!
+.globl begtext, begdata, begbss, endtext, enddata, endbss  ! //.globl 伪指令，用于定义随后的标识符是外部的或全局的。
+.text                                 ! //定义文本段(有的说当前代码段 无奈)
 begtext:
-.data
+.data					! //定义数据段
 begdata:
-.bss
+.bss					! //定义未初始化数据段(Block Started by Symbol)
 begbss:
-.text
+.text					! //文本段：
 
-SETUPLEN = 4				! nr of setup-sectors
+SETUPLEN = 4				! nr of setup-sectors 
 BOOTSEG  = 0x07c0			! original address of boot-sector
 INITSEG  = 0x9000			! we move boot here - out of the way
 SETUPSEG = 0x9020			! setup starts here
