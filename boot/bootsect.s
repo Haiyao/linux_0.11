@@ -16,7 +16,7 @@ SYSSIZE = 0x3000
 ! 
 ! It then loads 'setup' directly after itself (0x90200), and the system
 ! at 0x10000, using BIOS interrupts. 
-! // 然后在他末尾（0x90200）直接加载 ‘setup’，在0x10000处的系统，使用BIOS中断
+! // 然后在他之后（0x90200）直接加载 ‘setup’，在0x10000处的系统--使用BIOS中断
 !
 ! NOTE! currently system is at most 8*65536 bytes long. This should be no
 ! problem, even in the future. I want to keep it simple. This 512 kB
@@ -41,16 +41,21 @@ begdata:
 begbss:
 .text					! //文本段：
 
-SETUPLEN = 4				! nr of setup-sectors 
-BOOTSEG  = 0x07c0			! original address of boot-sector
-INITSEG  = 0x9000			! we move boot here - out of the way
-SETUPSEG = 0x9020			! setup starts here
-SYSSEG   = 0x1000			! system loaded at 0x10000 (65536).
-ENDSEG   = SYSSEG + SYSSIZE		! where to stop loading  =0x4000
+SETUPLEN = 4				! nr of setup-sectors  //setup-sectors数(应该是吧,nr是个什么鬼，看名字是setup长度) -- 段地址 注意以下不一一标记
+BOOTSEG  = 0x07c0			! original address of boot-sector //boot-sector起始地址
+INITSEG  = 0x9000			! we move boot here - out of the way //将boot移动到此地址 --大概是避开的意思
+SETUPSEG = 0x9020			! setup starts here // 从这里开始setup程序
+SYSSEG   = 0x1000			! system loaded at 0x10000 (65536). //(FFFF + 1) 系统在此处加载
+ENDSEG   = SYSSEG + SYSSIZE		! where to stop loading  =0x4000 //停止加载的地址 (3FFFF+ 1)
 
 ! ROOT_DEV:	0x000 - same type of floppy as boot.
-!		0x301 - first partition on first drive etc
-ROOT_DEV = 0x306
+!		0x301 - first partition on first drive etc  //根文件系统在第一个硬盘的上的第一个分区。
+ROOT_DEV = 0x306   
+! // 0x306设备号指定根文件系统在第2个硬盘的第1个分区。作者当时写这个内核时候实在第二个硬盘安装的这个
+! //内核，所以他写是第二个硬盘。此处在编译时可以根据自己文件系统所在的位置来更改这个 设备号 。
+! //此处的设备号是linux老式的硬盘命名规则。
+! //设备号 = 主设备号 * 256 + 次设备号 (DEV_NO = (major << 8) + minor)
+! //(主设备号: 1-内存，2-磁盘，3-硬盘，4-ttyx，5-tty，6-并行口，7-非命名管道)
 
 entry start
 start:
