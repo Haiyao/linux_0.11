@@ -74,18 +74,22 @@ start:
 	mov	ax,#INITSEG
 	mov	es,ax			!extraseg=0x9000_The boot address // 启动地址。附加段寄存器 ES。当前使用附加数据段段基。（串）
 	mov	cx,#256
-	sub	si,si         	!si=0 //源
-	sub	di,di			!di=0 //目的
+	sub	si,si         	!si=0 //源 		si源变址寄存器
+	sub	di,di			!di=0 //目的 	di目的变址寄存器
 	rep					!连续执行串指令（CX不等于0），每执行一次cx减一
-	movw				！串（字）传送，将si所指向的数据段的一个字送到di所指附加段内一个字的存储单元。如果CF=0,SI DI +2,如果CF=1,-2
-!此段将si 0~256数据段内数据送到DI 0~256附加段内，以2为一单位
-	jmpi	go,INITSEG		!段间转跳，INITSEG表示段地址，go是偏移地址
-go:	mov	ax,cs
-	mov	ds,ax
-	mov	es,ax
+	movw				! 串（字）传送，将si所指向的数据段的一个字送到di所指附加段内一个字的存储单元。如果CF=0,SI DI +2,如果CF=1,-2
+						!此段将ds 0~512数据段内数据送到es 0~512附加段内，以2字节为一单位(2字节 = 1 字) -- mov es:di ds:si 以2字节为单位赋值，执行256次。
+						! 这句话默认将0x07c00~0x07E00传送到0x90000~0x90200 ??
+	jmpi	go,INITSEG		!段间转跳，INITSEG表示段地址，go是偏移地址 
+
+	! //此时程序转跳到INITSEG:go处执行
+	! //cs代码段寄存器 0x9000
+go:	mov	ax,cs      !中转
+	mov	ds,ax		! //ds 0x9000
+	mov	es,ax		! //es 0x9000
 ! put stack at 0x9ff00.
-	mov	ss,ax
-	mov	sp,#0xFF00		! arbitrary value >>512
+	mov	ss,ax		! //ss栈段寄存器 0x9000 ss:sp -- 0x9ff00
+	mov	sp,#0xFF00		! arbitrary value >>512 //这里给sp栈指针寄存器复制可以是任意远大于512的数。就是说合吧起来远大于0x90200就行
 
 ! load the setup-sectors directly after the bootblock.
 ! Note that 'es' is already set up.
