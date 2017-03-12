@@ -56,16 +56,26 @@ ROOT_DEV = 0x306
 ! //此处的设备号是linux老式的硬盘命名规则。
 ! //设备号 = 主设备号 * 256 + 次设备号 (DEV_NO = (major << 8) + minor)
 ! //(主设备号: 1-内存，2-磁盘，3-硬盘，4-ttyx，5-tty，6-并行口，7-非命名管道)
+! //0x300 -/dev/hd0 第一个硬盘
+! //0x301 -/dev/hd1 第一个硬盘的第一个分区
+! //0x302 -/dev/hd2 第一个硬盘的第二个分区
+! // ...
+! //0x304 -/dev/hd4 第一个硬盘的第四个分区
+! //0x305 -/dev/hd5  此处表示第二个硬盘
+! //0x306 -/dev/hd6 第二个硬盘的第一个分区
+! // ...
+! //0x309 -/dev/hd9 第二个硬盘的第四个分区
 
 entry start
 start:
 	mov	ax,#BOOTSEG
-	mov	ds,ax     		!dataseg=0x07c0_The original address
+	mov	ds,ax     		!dataseg=0x07c0_The original address //0x07c0.起始段值。数据段寄存器DS。
+									! //指向程序现在使用的数据在内存中存放段基值。(只用使用普通寄存器中转将一个立即数传给段寄存器）
 	mov	ax,#INITSEG
-	mov	es,ax			!extraseg=0x9000_The boot address
+	mov	es,ax			!extraseg=0x9000_The boot address // 启动地址。附加段寄存器 ES。当前使用附加数据段段基。（串）
 	mov	cx,#256
-	sub	si,si         	!si=0
-	sub	di,di			!di=0
+	sub	si,si         	!si=0 //源
+	sub	di,di			!di=0 //目的
 	rep					!连续执行串指令（CX不等于0），每执行一次cx减一
 	movw				！串（字）传送，将si所指向的数据段的一个字送到di所指附加段内一个字的存储单元。如果CF=0,SI DI +2,如果CF=1,-2
 !此段将si 0~256数据段内数据送到DI 0~256附加段内，以2为一单位
